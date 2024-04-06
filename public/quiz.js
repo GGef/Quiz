@@ -94,7 +94,7 @@ function loadQuiz(selectedQuiz) {
         // Itérer sur les propriétés de l'objet question pour générer les options
         ['a', 'b', 'c', 'd', 'e', 'f'].forEach(option => {
             if (q[option]) { // Vérifier si l'option existe
-                quizHtml += `<label class="inline-flex items-center">
+                quizHtml += `<label class="inline-flex items-start">
                                 <input type="radio" name="question${index}" value="${option}" class="mr-2">${q[option]}
                               </label>`;
             }
