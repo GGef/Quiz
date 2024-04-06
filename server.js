@@ -24,36 +24,28 @@ app.use(express.static('public'));
 
 // Route pour soumettre les réponses du quiz
 app.post('/submit-quiz', cors(), async (req, res) => {
-    const { userFirstName , userLastName , userEmail , userDiscipline , userGroupe , userEnsemble,selectedQuiz,testDate ,quizResults } = req.body;
-
+    const { userFirstName, userLastName, userEmail, userDiscipline, userGroupe, userEnsemble, selectedQuiz, testDate, quizResults } = req.body;
 
     // Lire et parser le fichier de réponses
     const answersData = await fs.readFile('./answers.json', 'utf-8');
     const correctAnswers = JSON.parse(answersData);
 
-
-    // Logique de validation (exemplaire, à adapter)
     let score = 0;
    
     const responseDetails = quizResults.map((answer, index) => {
-        // Supposons que correctAnswers est disponible et contient la bonne réponse pour chaque question
         const isCorrect = answer.value === correctAnswers[selectedQuiz][index];
         if (isCorrect) {
             score++;
         }
         return { ...answer, isCorrect };
+    });
 
-
-     });
-
-     res.json({ score, responses: responseDetails });
-
-     const dataToSend = {
+    const dataToSend = {
         "data": [{
             "Discipline": userDiscipline,
             "Groupe": userGroupe,
             "Ensemble": userEnsemble,
-            "Nom & Prenom": userFirstName + userLastName,
+            "Nom & Prenom": userFirstName + " " + userLastName,
             "Email": userEmail,
             "Note": score,
             "Date": testDate,
@@ -62,17 +54,23 @@ app.post('/submit-quiz', cors(), async (req, res) => {
     };
 
     // Exemple d'envoi des résultats à SheetDB
-    const response = await fetch(process.env.SHEETDB_API_URL, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(dataToSend ),
-    });
+    try {
+        const responseSheetDB = await fetch(process.env.SHEETDB_API_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(dataToSend),
+        });
 
-    if (response.ok) {
-        res.json({ success: true, message: 'Quiz soumis avec succès!' });
-    } else {
+        if (responseSheetDB.ok) {
+            // Réponse au client après succès de l'enregistrement à SheetDB
+            res.json({ success: true, message: 'Quiz soumis avec succès!', score, responses: responseDetails });
+        } else {
+            throw new Error('Failed to submit to SheetDB');
+        }
+    } catch (error) {
+        console.error(error);
         res.status(500).json({ success: false, message: 'Erreur lors de la soumission du quiz.' });
     }
 });
