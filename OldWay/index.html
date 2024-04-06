@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Dynamique Culture Digitale</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.1.2/dist/tailwind.min.css" rel="stylesheet">
+</head>
+
+<body class="bg-gray-100 p-6">
+    <!-- Header with Navigation Menu -->
+    <header class="bg-blue-600 text-white p-4">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-xl font-bold">Quiz Culture Digitale</h1>
+            <nav>
+                <ul class="flex space-x-4">
+                    <li><a href="http://127.0.0.1:5500/index.html" class="hover:underline">Recommencer</a></li>
+
+                </ul>
+            </nav>
+        </div>
+    </header>
+    <div class="container mx-auto">
+
+
+        <div id="email-form" class="bg-white p-8 rounded-lg shadow-lg">
+            <h2 class="text-2xl font-semibold mb-6">Veuillez entrer vos informations pour commencer le quiz</h2>
+
+            <input type="text" id="first-name-input" class="border-2 border-gray-300 p-3 rounded-lg w-full mb-4"
+                placeholder="Votre prénom">
+
+            <input type="text" id="last-name-input" class="border-2 border-gray-300 p-3 rounded-lg w-full mb-4"
+                placeholder="Votre nom">
+
+            <input type="email" id="email-input" class="border-2 border-gray-300 p-3 rounded-lg w-full mb-4"
+                placeholder="Votre adresse e-mail">
+
+            <!-- Sélecteur pour la discipline principale -->
+            <select id="discipline-selector" class="border-2 border-gray-300 p-3 rounded-lg w-full mb-4">
+                <option value="" selected>Sélectionnez une discipline</option>
+                <option value="economie">Économie</option>
+                <option value="gestion">Gestion</option>
+                <option value="droit-pr-fr">Droit Prive en Français</option>
+                <option value="droit-pr-ar">Droit Prive en Arabe</option>
+                <option value="droit-pb-fr">Droit Public en Français</option>
+                <option value="droit-pb-ar">Droit Public en Arabe</option>
+            </select>
+
+            <!-- Sélecteur pour les sous-disciplines -->
+            <select id="sub-discipline-selector" class="border-2 border-gray-300 p-3 rounded-lg w-full mb-4">
+                <option value="">Sélectionnez une sous-discipline</option>
+                <!-- Les options seront ajoutées dynamiquement en JS -->
+            </select>
+
+            <!-- Sélecteur pour les catégories -->
+            <select id="category-selector" class="border-2 border-gray-300 p-3 rounded-lg w-full mb-4">
+                <option value="">Sélectionnez une catégorie</option>
+                <!-- Les options seront ajoutées dynamiquement en JS -->
+            </select>
+
+            <button onclick="showQuizForm()"
+                class="mt-4 px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">
+                Commencer le Quiz
+            </button>
+            <!-- Élément pour afficher le message d'erreur -->
+            <p id="error-message" class="text-red-500 text-sm mt-2 hidden"></p>
+        </div>
+
+
+        <div id="quiz-selection-form" class="bg-white p-8 rounded shadow-md">
+            <h2 class="text-xl font-semibold mb-5">Sélectionnez un quiz pour commencer</h2>
+            <select id="quiz-selector" class="border p-2 rounded w-full mb-4">
+                <option value="">--Choisissez un quiz--</option>
+                <option value="quiz1">Quiz 1 - Environnement de travail matériel </option>
+                <option value="quiz2">Quiz 2 - Environnement de travail logiciel</option>
+                <option value="quiz3">Quiz 3 - Internet et le Web</option>
+                <option value="quiz4">Quiz 4 - Intelligence artificielle et applications</option>
+            </select>
+            <button onclick="startQuiz()"
+                class="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700">Suivant</button>
+        </div>
+
+        <div id="quiz-container" class="bg-white p-8 rounded shadow-md">
+            <h2 class="text-xl font-semibold mb-5">Chargement du quiz...</h2>
+            <!-- Le quiz sera chargé ici -->
+        </div>
+        <button id="submit-btn" onclick="submitQuiz()"
+            class="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700">Soumettre les réponses</button>
+    </div>
+    <footer class="bg-gray-200 text-gray-700 p-4 mt-6">
+        <div class="container mx-auto text-center">
+            <p>&copy; 2024 Mon Quiz Mise en Oeuvre par Farouk Gharbaoui. Tous droits réservés.</p>
+        </div>
+    </footer>
+
+    <script src="questions.js"></script>
+    <script src="quiz.js"></script>
+    <script src="answers.js"></script>
+    <script src="quiz-copy.js"></script>
+
+</body>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Définissez les groupes disponibles pour chaque discipline
+        const groupesParDiscipline = {
+            economie: ["Groupe 1", "Groupe 2", "Groupe 3", "Groupe 4", "Groupe 5", "Groupe 6", "Groupe 7", "Groupe 8", "Groupe 9", "Groupe 10"],
+            gestion: ["Groupe 1", "Groupe 2", "Groupe 3", "Groupe 4"],
+            'droit-pr-fr': ["Groupe 1"],
+            'droit-pb-fr': ["Groupe 1"],
+            'droit-pb-ar': ["Groupe 1"],
+            'droit-pr-ar': ["Groupe 1", "Groupe 2", "Groupe 3", "Groupe 4", "Groupe 5"],
+            // Ajoutez ici les autres disciplines si nécessaire
+        };
+
+        // Récupérez les éléments du DOM
+        const selectDiscipline = document.getElementById('discipline-selector');
+        const selectSousDiscipline = document.getElementById('sub-discipline-selector');
+
+        // Écoutez les changements sur le premier select
+        selectDiscipline.addEventListener('change', () => {
+            const disciplineChoisie = selectDiscipline.value;
+
+            // Supposons que vous avez une fonction pour obtenir les groupes basés sur la discipline
+            const groupes = groupesParDiscipline[disciplineChoisie]; // Implémentez cette fonction selon vos besoins
+
+            selectSousDiscipline.innerHTML = '<option value="">Sélectionnez un groupe</option>';
+
+            groupes.forEach(groupe => {
+                const option = document.createElement('option');
+                option.value = `${disciplineChoisie}-${groupe}`; // Combine la discipline avec le nom du groupe pour un identifiant unique
+                option.textContent = groupe;
+                selectSousDiscipline.appendChild(option);
+            });
+        });
+    });
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Supposons que cette structure de données mappe chaque groupe à ses correspondances
+        const ltecsParGroupe = {
+            "economie-Groupe 1": ["LTEC 1 (D01 & D02)", "LTEC 2 (D03 & D04)", "LTEC 3 (D05 & D06)"],
+            "economie-Groupe 2": ["LTEC 4 (D07 & D08)", "LTEC 5 (D09 & D10)", "LTEC 6 (D11 & D12)"],
+            "economie-Groupe 3": ["LTEC 7 (D13 & D14)", "LTEC 8 (D15 & D16)", "LTEC 9 (D17 & D18)"],
+            "economie-Groupe 4": ["LTEC 10 (D19 & D20)", "LTEC 11 (D21 & D22)", "LTEC 12 (D23 & D24)"],
+
+            "gestion-Groupe 1": ["LTGE 1 (D25 & D26)", "LTGE 2 (D27 & D28)", "LTGE 3 (D29 & D30)"],
+            "gestion-Groupe 2": ["LTGE 4 (D31 & D32)", "LTGE 5 (D33 & D34)", "LTGE 6 (D35 & D36)"],
+            "gestion-Groupe 3": ["LTGE 7 (D37 & D38)", "LTGE 8 (D39 & D40)", "LTGE 9 (D41 & D42)"],
+            "gestion-Groupe 4": ["LTGE 10 (D43 & D44)", "LTGE 11 (D45 & D46)", "LTGE 12 (D47 & D48)"],
+            "gestion-Groupe 5": ["LTGE 13 (D49 & D50)", "LTGE 14 (D51 & D52)", "LTGE 15(D53 & D54)"],
+            "gestion-Groupe 6": ["LTGE 16 (D55 & D56)", "LTGE 17 (D57 & D58)", "LTGE 18 (D59 & D60)"],
+            "gestion-Groupe 7": ["LTGE 19 (D61 & D62)", "LTGE 20 (D63 & D64)", "LTGE 21 (D65 & D66)"],
+            "gestion-Groupe 8": ["LTGE 22 (D67 & D68)", "LTGE 23 (D69 & D70)", "LTGE 24 (D71 & D72)"],
+            "gestion-Groupe 9": ["LTGE 25 (D73 & D74)", "LTGE 26 (D75 & D76)", "LTGE 27 (D77 & D78)"],
+            "gestion-Groupe 10": ["LTGE 28 (D79 & D80)", "LTGE 29 (D81 & D82)", "LTGE 30 (D83 & D84)"],
+
+            "droit-pr-ar-Groupe 1": ["LTAV 1 (D85 & D86)", "LTAV 2 (D87 & D88)", "LTAV 3 (D89 & D90)"],
+            "droit-pr-ar-Groupe 2": ["LTAV 4 (D91 & D92)", "LTAV 5 (D93 & D94)", "LTAV 6 (D95 & D96)"],
+            "droit-pr-ar-Groupe 3": ["LTAV 7 (D97 & D98)", "LTAV 8 (D99 & D100)", "LTAV 9 (D101 & D102)"],
+            "droit-pr-ar-Groupe 4": ["LTAV 10 (D103 & D104)", "LTAV 11 (D105 & D106)", "LTAV 12 (D107 & D108)"],
+            "droit-pr-ar-Groupe 5": ["LTAV 13 (D109 & D110)", "LTAV 14 (D111 & D112)", "LTAV 15 (D113 & D114)"],
+
+            "droit-pb-ar-Groupe 1": ["LTAP 1 (D115 & D116)", "LTAP 2 (D117 & D118)", "LTAP 3 (D119 & D120)"],
+            "droit-pr-fr-Groupe 1": ["LTFV 1 (D121 & D122)", "LTFV 2 (D123 & D124)", "LTFV 3 (D125 & D126)"],
+            "droit-pb-fr-Groupe 1": ["LTFP 1 (D127 & D128)", "LTFP 2 (D129 & D130)", "LTFP 3 (D131 & D132)"],
+
+
+        };
+
+
+        // Récupérez les éléments du DOM pour les sélecteurs de groupe et LTEC
+        const selectGroupe = document.getElementById('sub-discipline-selector');
+        const selectLTEC = document.getElementById('category-selector');
+
+        // Écoutez les changements sur le sélecteur de groupe
+        selectGroupe.addEventListener('change', () => {
+            const groupeChoisi = selectGroupe.value; // Cela inclura maintenant la discipline, par ex. "economie-Groupe 1"
+
+            const ltecs = ltecsParGroupe[groupeChoisi] || [];
+
+            selectLTEC.innerHTML = '<option value="">Sélectionnez un ensemble</option>';
+
+            ltecs.forEach(ltec => {
+                const option = document.createElement('option');
+                option.value = ltec;
+                option.textContent = ltec;
+                selectLTEC.appendChild(option);
+            });
+        });
+    });
+</script>
+
+
+</html>
