@@ -8,7 +8,7 @@ const cors = require('cors');
 const path = require('path');
 
 
-
+const allowedIPs = ['54.85.28.122']
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -24,6 +24,11 @@ app.use(express.static('public'));
 
 // Route pour soumettre les réponses du quiz
 app.post('/submit-quiz', cors(), async (req, res) => {
+    const sourceIP = req.ip;
+
+    if (!allowedIPs.includes(sourceIP)) {
+        return res.status(403).json({ message: "Accès non autorisé" });
+    }
     const { userFirstName, userLastName, userEmail, userDiscipline, userGroupe, userEnsemble, selectedQuiz, testDate, quizResults } = req.body;
 
     // Lire et parser le fichier de réponses
@@ -31,7 +36,7 @@ app.post('/submit-quiz', cors(), async (req, res) => {
     const correctAnswers = JSON.parse(answersData);
 
     let score = 0;
-   
+
     const responseDetails = quizResults.map((answer, index) => {
         const isCorrect = answer.value === correctAnswers[selectedQuiz][index];
         if (isCorrect) {
@@ -40,7 +45,7 @@ app.post('/submit-quiz', cors(), async (req, res) => {
         return { ...answer, isCorrect };
     });
 
-    const FinalScore = score +'/'+correctAnswers[selectedQuiz].length
+    const FinalScore = score + '/' + correctAnswers[selectedQuiz].length
 
     const dataToSend = {
         "data": [{

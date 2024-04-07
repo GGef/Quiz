@@ -124,7 +124,7 @@ function startQuiz() {
     selectedQuiz = document.getElementById('quiz-selector').value;
     // Si toutes les validations sont passées, cacher le formulaire d'email et afficher le quiz
 
-    console.log(selectedQuiz);
+    
     // Charger le quiz sélectionné
     loadQuiz(selectedQuiz);
 }
