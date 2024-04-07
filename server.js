@@ -24,11 +24,11 @@ app.use(express.static('public'));
 
 // Route pour soumettre les réponses du quiz
 app.post('/submit-quiz', cors(), async (req, res) => {
-    const sourceIP = req.ip;
+    // const sourceIP = req.ip;
 
-    if (!allowedIPs.includes(sourceIP)) {
-        return res.status(403).json({ message: "Accès non autorisé" });
-    }
+    // if (!allowedIPs.includes(sourceIP)) {
+    //     return res.status(403).json({ message: "Accès non autorisé" });
+    // }
     const { userFirstName, userLastName, userEmail, userDiscipline, userGroupe, userEnsemble, selectedQuiz, testDate, quizResults } = req.body;
 
     // Lire et parser le fichier de réponses
