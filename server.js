@@ -40,7 +40,7 @@ app.post('/submit-quiz', cors(), async (req, res) => {
         return { ...answer, isCorrect };
     });
 
-    const FinalScore = score +'/'+quizResults.length
+    const FinalScore = score +'/'+correctAnswers[selectedQuiz].length
 
     const dataToSend = {
         "data": [{
