@@ -129,42 +129,73 @@ function startQuiz() {
     loadQuiz(selectedQuiz);
 }
 
+document.addEventListener('DOMContentLoaded', () => {
+    setupInputValidation(); // Configure la validation dès que le DOM est chargé
+});
 
-function showQuizForm() {
-    const firstNameInput = document.getElementById('first-name-input');
-    const lastNameInput = document.getElementById('last-name-input');
-    const emailInput = document.getElementById('email-input');
-    const discipline = document.getElementById('discipline-selector');
-    const groupe = document.getElementById('sub-discipline-selector');
-    const ensemble = document.getElementById('category-selector');
-
-    // Validation basique des entrées et mise en évidence des champs non remplis
-    let isFormValid = true; // Supposons que le formulaire est valide au début
-
-    [firstNameInput, lastNameInput, emailInput, discipline, groupe, ensemble].forEach(input => {
-        // Réinitialise la couleur de bordure à celle par défaut ou à rien
-        input.style.borderColor = '';
-
-        if (input === emailInput) {
-            if (!input.value.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input.value.trim())) {
-                input.style.borderColor = 'red'; // Change la couleur de la bordure en rouge
-                isFormValid = false; // Indique une erreur dans le formulaire
-            }
-        } else if (!input.value.trim()) {
-            input.style.borderColor = 'red'; // Change la couleur de la bordure en rouge pour les champs vides
-            isFormValid = false; // Indique une erreur dans le formulaire
-        }
-    });
-
+function validateInput(input) {
+    input.style.borderColor = ''; // Réinitialise la couleur de bordure
     const errorMessageElement = document.getElementById('error-message');
 
+    if (input === document.getElementById('email-input')) {
+        if (!input.value.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input.value.trim())) {
+            input.style.borderColor = 'red'; // Bordure rouge pour les emails invalides
+            errorMessageElement.textContent = "Veuillez entrer une adresse e-mail valide.";
+            errorMessageElement.classList.remove('hidden');
+            return false;
+        }
+    } else if (!input.value.trim()) {
+        input.style.borderColor = 'red'; // Bordure rouge pour les champs vides
+        errorMessageElement.textContent = "Veuillez remplir tous les champs.";
+        errorMessageElement.classList.remove('hidden');
+        return false;
+    }
+    return true; // Le champ est valide
+}
+
+function setupInputValidation() {
+    const inputs = [
+        document.getElementById('first-name-input'),
+        document.getElementById('last-name-input'),
+        document.getElementById('email-input'),
+        document.getElementById('discipline-selector'),
+        document.getElementById('sub-discipline-selector'),
+        document.getElementById('category-selector')
+    ];
+
+    inputs.forEach(input => {
+        input.addEventListener('input', () => {
+            validateInput(input); // Valide chaque champ lors de sa modification
+        });
+    });
+}
+
+
+function showQuizForm() {
+    let isFormValid = true;
+
+    const inputs = [
+        document.getElementById('first-name-input'),
+        document.getElementById('last-name-input'),
+        document.getElementById('email-input'),
+        document.getElementById('discipline-selector'),
+        document.getElementById('sub-discipline-selector'),
+        document.getElementById('category-selector')
+    ];
+
+    const errorMessageElement = document.getElementById('error-message');
+    errorMessageElement.classList.add('hidden'); // Cache par défaut le message d'erreur
+
+    // Applique la validation initiale pour chaque champ
+    inputs.forEach(input => {
+        const isValid = validateInput(input);
+        if (!isValid) isFormValid = false; // Si un champ n'est pas valide, le formulaire ne l'est pas non plus
+    });
+
     if (!isFormValid) {
-        console.log("Veuillez remplir tous les champs requis."); // Optionnel, pourrait être retiré
-        errorMessageElement.textContent = "Veuillez remplir tous les champs."; // Mettez à jour le texte du message d'erreur
-        errorMessageElement.classList.remove('hidden'); // Rend le message d'erreur visible
+        console.log("Veuillez remplir tous les champs requis."); // Log optionnel
+        errorMessageElement.classList.remove('hidden'); // Affiche le message d'erreur si le formulaire n'est pas valide
         return; // Arrête l'exécution si le formulaire n'est pas valide
-    } else {
-        errorMessageElement.classList.add('hidden'); // Cache le message d'erreur si le formulaire est corrigé et re-soumis
     }
 
     // Si le formulaire est valide
