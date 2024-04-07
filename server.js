@@ -11,7 +11,7 @@ const path = require('path');
 
 
 const app = express();
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 3000;
 
 // Middleware pour parser le corps des requêtes en JSON
 app.use(bodyParser.json());
