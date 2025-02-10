@@ -49,7 +49,7 @@ async function submitQuiz() {
     const testDate = getFormattedDate();
 
     // Appel à votre API serveur pour soumettre les résultats
-    const response = await fetch('/submit-quiz', {
+    const response = await fetch('/.netlify/functions/submit-quiz', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
